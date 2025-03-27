@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculator</title>
+    <style>
+        body {
+            background-color: #e6e6e6;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+        }
+        #calculator {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        #display {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        #output {
+            background-color: #f4f4f4;
+            padding: 10px;
+            height: 150px;
+            overflow-y: auto;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        button {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="calculator">
+        <input type="text" id="display" placeholder="Enter calculation..." onkeypress="handleKeyPress(event)">
+        <div id="output"></div>
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const output = document.getElementById('output');
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const userMessage = display.value.trim();
+            if (!userMessage) return;
+            output.innerHTML += `<div><strong>You:</strong> ${userMessage}</div>`;
+            display.value = '';
+            output.scrollTop = output.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userMessage })
+                });
+
+                const data = await response.json();
+                const botMessage = data.choices?.[0]?.message?.content || 'Error: No response.';
+                output.innerHTML += `<div><strong>GPT:</strong> ${botMessage}</div>`;
+                output.scrollTop = output.scrollHeight;
+            } catch (err) {
+                output.innerHTML += `<div><strong>GPT:</strong> Error contacting GPT.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
