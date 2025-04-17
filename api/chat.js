@@ -13,7 +13,7 @@ export default async function handler(req) {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4-turbo',
+        model: 'gpt-4.1-mini',
         messages: [{ role: 'user', content: message }]
       })
     });
